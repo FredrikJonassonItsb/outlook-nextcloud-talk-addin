@@ -1,0 +1,28 @@
+{
+  "name": "outlook-nextcloud-talk-addin",
+  "version": "1.0.0",
+  "description": "Outlook add-in for Nextcloud Talk and Calendar integration",
+  "main": "src/taskpane/taskpane.js",
+  "scripts": {
+    "start": "office-addin-debugging start manifest.xml",
+    "stop": "office-addin-debugging stop manifest.xml",
+    "validate": "office-addin-manifest validate manifest.xml",
+    "serve": "http-server -p 8080 -c-1"
+  },
+  "keywords": [
+    "outlook",
+    "office-addin",
+    "nextcloud",
+    "talk",
+    "calendar"
+  ],
+  "author": "ITSLyzer",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "office-addin-debugging": "^5.0.0",
+    "office-addin-manifest": "^1.13.0",
+    "http-server": "^14.1.1"
+  }
+}
+
