@@ -26,7 +26,7 @@ const CONFIG = {
   oauth: {
     clientId: 'outlook-nextcloud-addin',
     clientSecret: '', // Should be configured securely
-    redirectUri: 'https://localhost:8080/src/taskpane/callback.html',
+    redirectUri: 'https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/src/taskpane/callback.html',
     scope: 'openid profile email',
     responseType: 'code'
   },
@@ -34,7 +34,7 @@ const CONFIG = {
   // Application settings
   app: {
     name: 'Nextcloud Talk for Outlook',
-    version: '1.0.0',
+    version: '2.0.0',
     defaultLocale: 'en-US',
     supportedLocales: ['en-US', 'sv-SE']
   },

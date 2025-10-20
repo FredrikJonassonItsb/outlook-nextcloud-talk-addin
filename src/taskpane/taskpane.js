@@ -297,20 +297,29 @@ async function handleLogin() {
       return;
     }
     
-    // Test connection
+    // Remove trailing slash
+    const cleanServerUrl = serverUrl.replace(/\/$/, '');
+    
+    // Show status
     showStatus(t('status.authenticating'), 'loginError');
-    const connected = await testConnection(serverUrl);
+    hideError('loginError');
     
-    if (!connected) {
-      showError(t('error.connection'), 'loginError');
-      return;
+    // Initiate login (skip connection test for now to avoid CORS issues)
+    try {
+      await login(cleanServerUrl);
+      
+      // Show main view
+      await showMainView();
+    } catch (loginError) {
+      console.error('Login error:', loginError);
+      
+      // Check if it's a dialog error
+      if (loginError.message && loginError.message.includes('dialog')) {
+        showError('Could not open login dialog. Please check that pop-ups are allowed and try again.', 'loginError');
+      } else {
+        showError(loginError.message || t('error.authentication'), 'loginError');
+      }
     }
-    
-    // Initiate login
-    await login(serverUrl);
-    
-    // Show main view
-    await showMainView();
     
   } catch (error) {
     console.error('Login error:', error);

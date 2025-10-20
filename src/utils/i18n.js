@@ -5,6 +5,9 @@
 
 const translations = {
   'en-US': {
+    // App
+    'app.title': 'Nextcloud Talk',
+    
     // Buttons
     'button.addMeeting': 'Add Nextcloud Talk Meeting',
     'button.cancel': 'Cancel',
@@ -74,6 +77,9 @@ const translations = {
   },
   
   'sv-SE': {
+    // App
+    'app.title': 'Nextcloud Talk',
+    
     // Buttons
     'button.addMeeting': 'Lägg till Nextcloud Talk-möte',
     'button.cancel': 'Avbryt',
