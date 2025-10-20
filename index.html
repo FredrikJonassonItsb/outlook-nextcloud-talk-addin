@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nextcloud Talk for Outlook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #0082c9 0%, #30a0e0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #0082c9;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 40px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .feature h3 {
+            color: #0082c9;
+            margin-bottom: 10px;
+        }
+        
+        .cta {
+            margin-top: 40px;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            background: #0082c9;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .button:hover {
+            background: #006ba1;
+        }
+        
+        .button.secondary {
+            background: #6c757d;
+        }
+        
+        .button.secondary:hover {
+            background: #545b62;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0082c9;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .info-box h3 {
+            color: #0082c9;
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="src/assets/icon-128.png" alt="Nextcloud" class="logo">
+        <h1>Nextcloud Talk for Outlook</h1>
+        <p class="subtitle">Integrera Nextcloud Talk-möten direkt i Microsoft Outlook</p>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>🎥 Enkla videomöten</h3>
+                <p>Skapa Nextcloud Talk-möten med ett klick direkt från Outlook</p>
+            </div>
+            <div class="feature">
+                <h3>📅 Kalenderintegration</h3>
+                <p>Automatisk synkronisering till Nextcloud Kalender</p>
+            </div>
+            <div class="feature">
+                <h3>🔒 Säkerhetsalternativ</h3>
+                <p>Deltagarspecifika säkerhetsinställningar med BankID-stöd</p>
+            </div>
+            <div class="feature">
+                <h3>🌍 Flerspråkigt</h3>
+                <p>Stöd för svenska och engelska</p>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h3>📋 Installation</h3>
+            <p>För att installera tillägget i din Microsoft 365-instans:</p>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Gå till Microsoft 365 Admin Center</li>
+                <li>Settings → Integrated apps → Upload custom apps</li>
+                <li>Ladda upp <code>manifest.xml</code> eller använd URL:en nedan</li>
+            </ol>
+        </div>
+        
+        <div class="info-box">
+            <h3>🔗 Manifest URL</h3>
+            <p>Du kan installera direkt från URL:</p>
+            <code style="display: block; margin-top: 10px; word-break: break-all;">
+                https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/manifest.xml
+            </code>
+        </div>
+        
+        <div class="info-box">
+            <h3>⚙️ OAuth Redirect URI</h3>
+            <p>Konfigurera i Nextcloud (Settings → Security → OAuth 2.0):</p>
+            <code style="display: block; margin-top: 10px; word-break: break-all;">
+                https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/src/taskpane/callback.html
+            </code>
+        </div>
+        
+        <div class="cta">
+            <a href="manifest.xml" class="button" download>Ladda ner Manifest</a>
+            <a href="https://github.com/FredrikJonassonItsb/outlook-nextcloud-talk-addin" class="button secondary" target="_blank">GitHub Repository</a>
+        </div>
+        
+        <footer>
+            <p><strong>Nextcloud Talk for Outlook</strong> v1.0.0</p>
+            <p>Utvecklad av ITSLyzer | MIT License</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/FredrikJonassonItsb/outlook-nextcloud-talk-addin" style="color: #0082c9;">GitHub</a> | 
+                <a href="https://github.com/FredrikJonassonItsb/outlook-nextcloud-talk-addin/issues" style="color: #0082c9;">Support</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
+

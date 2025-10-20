@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nextcloud Talk for Outlook</title>
+  
+  <!-- Office.js -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  
+  <!-- Application scripts -->
+  <script src="../utils/config.js"></script>
+  <script src="../utils/i18n.js"></script>
+  <script src="../utils/storage.js"></script>
+  <script src="../services/auth-service.js"></script>
+  <script src="../services/nextcloud-api.js"></script>
+  <script src="../services/outlook-service.js"></script>
+  <script src="taskpane.js"></script>
+  
+  <link rel="stylesheet" href="taskpane.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Header -->
+    <header class="header">
+      <img src="../assets/icon-64.png" alt="Nextcloud" class="logo">
+      <h1 class="title" data-i18n="app.title">Nextcloud Talk</h1>
+    </header>
+    
+    <!-- Login view -->
+    <div id="loginView" class="view" style="display: none;">
+      <div class="content">
+        <p class="instruction" data-i18n="instruction.login">
+          Please login to your Nextcloud account to continue
+        </p>
+        
+        <div class="form-group">
+          <label for="serverUrl" data-i18n="label.serverUrl">Nextcloud Server URL</label>
+          <input 
+            type="url" 
+            id="serverUrl" 
+            class="input" 
+            placeholder="https://nextcloud.example.com"
+            value="">
+        </div>
+        
+        <button id="loginButton" class="button button-primary" data-i18n="button.login">
+          Login
+        </button>
+        
+        <div id="loginError" class="error" style="display: none;"></div>
+      </div>
+    </div>
+    
+    <!-- Main view -->
+    <div id="mainView" class="view" style="display: none;">
+      <div class="content">
+        
+        <!-- User info -->
+        <div id="userInfo" class="user-info">
+          <span id="userName" class="user-name"></span>
+          <button id="logoutButton" class="button button-link" data-i18n="button.logout">
+            Logout
+          </button>
+        </div>
+        
+        <!-- Meeting info -->
+        <div class="section">
+          <h2 class="section-title" data-i18n="label.meetingTitle">Meeting Title</h2>
+          <div id="meetingInfo" class="meeting-info">
+            <div class="info-row">
+              <span class="info-label" data-i18n="label.meetingTitle">Title:</span>
+              <span id="meetingTitle" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label" data-i18n="label.startTime">Start:</span>
+              <span id="meetingStart" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label" data-i18n="label.endTime">End:</span>
+              <span id="meetingEnd" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label" data-i18n="label.attendees">Attendees:</span>
+              <span id="meetingAttendees" class="info-value">-</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Attendee settings -->
+        <div class="section">
+          <h2 class="section-title" data-i18n="label.attendeeSettings">
+            Attendee Security Settings
+          </h2>
+          <p class="instruction" data-i18n="instruction.attendeeSettings">
+            Configure security settings for each attendee (optional)
+          </p>
+          
+          <div id="attendeeList" class="attendee-list">
+            <!-- Attendee items will be dynamically added here -->
+          </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="actions">
+          <button id="addMeetingButton" class="button button-primary" data-i18n="button.addMeeting">
+            Add Nextcloud Talk Meeting
+          </button>
+        </div>
+        
+        <!-- Status message -->
+        <div id="statusMessage" class="status" style="display: none;"></div>
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        
+      </div>
+    </div>
+    
+    <!-- Loading view -->
+    <div id="loadingView" class="view" style="display: block;">
+      <div class="content center">
+        <div class="spinner"></div>
+        <p data-i18n="status.loading">Loading...</p>
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>
+
