@@ -40,16 +40,20 @@ async function login(serverUrl) {
     // Build authorization URL
     const authUrl = buildAuthUrl(serverUrl);
     
-    // Open authentication dialog
-    return new Promise((resolve, reject) => {
-      Office.context.ui.displayDialogAsync(
-        authUrl,
-        { height: 60, width: 30 },
-        (result) => {
-          if (result.status === Office.AsyncResultStatus.Failed) {
-            reject(new Error('Failed to open login dialog'));
-            return;
-          }
+    // Try to use Office dialog API first
+    if (Office.context.ui && typeof Office.context.ui.displayDialogAsync === 'function') {
+      // Open authentication dialog
+      return new Promise((resolve, reject) => {
+        Office.context.ui.displayDialogAsync(
+          authUrl,
+          { height: 60, width: 30 },
+          (result) => {
+            if (result.status === Office.AsyncResultStatus.Failed) {
+              // Dialog API failed, try external window method
+              console.log('displayDialogAsync failed, trying external window');
+              loginWithExternalWindow(serverUrl).then(resolve).catch(reject);
+              return;
+            }
           
           const dialog = result.value;
           
@@ -91,11 +95,83 @@ async function login(serverUrl) {
           });
         }
       );
-    });
+      });
+    } else {
+      // Office dialog API not available, use external window method
+      console.log('Office.context.ui not available, using external window');
+      return await loginWithExternalWindow(serverUrl);
+    }
   } catch (error) {
     console.error('Login error:', error);
     throw error;
   }
+}
+
+/**
+ * Login using external window (fallback method)
+ * @param {string} serverUrl - Nextcloud server URL
+ * @returns {Promise<void>}
+ */
+async function loginWithExternalWindow(serverUrl) {
+  return new Promise((resolve, reject) => {
+    // Build authorization URL
+    const authUrl = buildAuthUrl(serverUrl);
+    
+    // Generate state for security
+    const state = Math.random().toString(36).substring(7);
+    const authUrlWithState = `${authUrl}&state=${state}`;
+    
+    // Create instructions UI
+    const instructionsHtml = `
+      <div style="padding: 20px; text-align: center; background: white;">
+        <h3 style="color: #0082c9; margin-bottom: 15px;">Login to Nextcloud</h3>
+        <p style="margin-bottom: 20px;">Click the button below to open the login page.</p>
+        <p style="margin-bottom: 20px;"><strong>After logging in, you will be redirected back.</strong></p>
+        <a href="${authUrlWithState}" target="_blank" 
+           style="display: inline-block; padding: 12px 24px; background: #0082c9; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+          Open Login Page →
+        </a>
+        <p style="margin-top: 20px; font-size: 12px; color: #666;">
+          If the window doesn't open, please allow pop-ups for this site.
+        </p>
+      </div>
+    `;
+    
+    // Show instructions
+    const loginView = document.getElementById('loginView');
+    if (loginView) {
+      const contentDiv = loginView.querySelector('.content');
+      if (contentDiv) {
+        const originalContent = contentDiv.innerHTML;
+        contentDiv.innerHTML = instructionsHtml;
+        
+        // Open the auth URL in a new window
+        const authWindow = window.open(authUrlWithState, '_blank', 'width=600,height=700');
+        
+        if (!authWindow) {
+          contentDiv.innerHTML = originalContent;
+          reject(new Error('Could not open login window. Please allow pop-ups.'));
+          return;
+        }
+        
+        // Poll for window close or message
+        const pollInterval = setInterval(() => {
+          if (authWindow.closed) {
+            clearInterval(pollInterval);
+            contentDiv.innerHTML = originalContent;
+            
+            // Check if we got tokens
+            const tokens = getTokens();
+            if (tokens && !tokens.isExpired) {
+              resolve();
+            } else {
+              reject(new Error('Login was not completed'));
+            }
+          }
+        }, 500);
+      }
+    }
+  });
 }
 
 /**
