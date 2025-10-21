@@ -24,8 +24,8 @@ const CONFIG = {
   
   // OAuth2/OIDC configuration
   oauth: {
-    clientId: 'outlook-nextcloud-addin',
-    clientSecret: '', // Should be configured securely
+    clientId: 'e9KdrQVdvNLeyDv9TjhfFLZ4sWwe8LzyMXpzbB8PcVIEvjVNvKkAaRaxesXNBOeB',
+    clientSecret: 'Y2AkOMa5D9dm4PsFy6GGwe1ejbIukX5K65obDL6c0uq9wuZUHzqctZMGIU5DJ3V8', // Configured for itsl2.hubs.se
     redirectUri: 'https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/src/taskpane/callback.html',
     scope: 'openid profile email',
     responseType: 'code'
