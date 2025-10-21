@@ -20,6 +20,7 @@
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
     }
     .spinner {
       width: 40px;
@@ -34,58 +35,166 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .success {
+      color: #28a745;
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .error {
+      color: #dc3545;
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .message {
+      margin-top: 16px;
+      color: #666;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="spinner"></div>
-    <p>Completing authentication...</p>
+    <div id="spinner" class="spinner"></div>
+    <p id="status">Completing authentication...</p>
+    <p id="message" class="message"></p>
   </div>
   
+  <script src="../utils/config.js"></script>
+  <script src="../utils/storage.js"></script>
+  
   <script>
-    (function() {
+    (async function() {
       'use strict';
       
-      // Parse URL parameters
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      const error = params.get('error');
-      const errorDescription = params.get('error_description');
+      const statusEl = document.getElementById('status');
+      const messageEl = document.getElementById('message');
+      const spinnerEl = document.getElementById('spinner');
       
-      // Send message to parent window
-      if (window.opener || window.parent) {
-        if (error) {
-          const message = {
-            error: errorDescription || error
-          };
-          
-          if (Office && Office.context && Office.context.ui) {
-            Office.context.ui.messageParent(JSON.stringify(message));
-          } else if (window.opener) {
-            window.opener.postMessage(message, '*');
-          }
-        } else if (code) {
-          const message = {
-            code: code
-          };
-          
-          if (Office && Office.context && Office.context.ui) {
-            Office.context.ui.messageParent(JSON.stringify(message));
-          } else if (window.opener) {
-            window.opener.postMessage(message, '*');
-          }
-        }
+      function showSuccess(msg) {
+        spinnerEl.style.display = 'none';
+        statusEl.innerHTML = '<div class="success">✓</div>' + msg;
+        messageEl.textContent = 'You can close this window now.';
       }
       
-      // Close window after a short delay
-      setTimeout(() => {
-        window.close();
-      }, 1000);
+      function showError(msg) {
+        spinnerEl.style.display = 'none';
+        statusEl.innerHTML = '<div class="error">✗</div>' + msg;
+        messageEl.textContent = 'Please try again.';
+      }
+      
+      try {
+        // Parse URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+        const error = params.get('error');
+        const errorDescription = params.get('error_description');
+        
+        if (error) {
+          showError('Authentication failed: ' + (errorDescription || error));
+          
+          // Try to send error to parent
+          if (window.opener) {
+            window.opener.postMessage({ error: errorDescription || error }, '*');
+          }
+          return;
+        }
+        
+        if (!code) {
+          showError('No authorization code received');
+          return;
+        }
+        
+        // Get server URL from storage
+        statusEl.textContent = 'Exchanging authorization code...';
+        
+        // Get server URL from localStorage (shared between windows)
+        const serverUrl = localStorage.getItem('nc_server_url');
+        
+        if (!serverUrl) {
+          showError('Server URL not found');
+          return;
+        }
+        
+        // Exchange code for tokens
+        const tokenUrl = `${serverUrl}/apps/oauth2/api/v1/token`;
+        
+        const body = new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          client_id: CONFIG.oauth.clientId,
+          client_secret: CONFIG.oauth.clientSecret,
+          redirect_uri: CONFIG.oauth.redirectUri
+        });
+        
+        const response = await fetch(tokenUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: body.toString()
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Token exchange failed:', errorText);
+          showError('Failed to exchange authorization code');
+          return;
+        }
+        
+        const data = await response.json();
+        
+        // Save tokens to localStorage (shared between windows)
+        const tokens = {
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+          expiresIn: data.expires_in,
+          tokenType: data.token_type,
+          expiresAt: Date.now() + (data.expires_in * 1000)
+        };
+        
+        localStorage.setItem('nc_access_token', tokens.accessToken);
+        localStorage.setItem('nc_refresh_token', tokens.refreshToken);
+        localStorage.setItem('nc_token_expiry', tokens.expiresAt.toString());
+        
+        // Get user profile
+        statusEl.textContent = 'Getting user profile...';
+        
+        const profileResponse = await fetch(`${serverUrl}/ocs/v2.php/cloud/user?format=json`, {
+          headers: {
+            'Authorization': `Bearer ${tokens.accessToken}`,
+            'OCS-APIRequest': 'true'
+          }
+        });
+        
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          if (profileData.ocs && profileData.ocs.data) {
+            localStorage.setItem('nc_user_profile', JSON.stringify(profileData.ocs.data));
+          }
+        }
+        
+        showSuccess('Authentication successful!');
+        
+        // Send success message to parent
+        if (window.opener) {
+          window.opener.postMessage({ 
+            success: true,
+            tokens: tokens
+          }, '*');
+        }
+        
+        // Close window after delay
+        setTimeout(() => {
+          window.close();
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Callback error:', error);
+        showError('An error occurred: ' + error.message);
+      }
     })();
   </script>
-  
-  <!-- Office.js for dialog communication -->
-  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 </body>
 </html>
 

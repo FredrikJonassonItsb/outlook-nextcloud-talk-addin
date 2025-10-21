@@ -154,15 +154,39 @@ async function loginWithExternalWindow(serverUrl) {
           return;
         }
         
-        // Poll for window close or message
+        // Listen for postMessage from callback window
+        const messageHandler = (event) => {
+          if (event.data && event.data.success) {
+            // Authentication successful
+            window.removeEventListener('message', messageHandler);
+            if (!authWindow.closed) {
+              authWindow.close();
+            }
+            contentDiv.innerHTML = originalContent;
+            resolve();
+          } else if (event.data && event.data.error) {
+            // Authentication failed
+            window.removeEventListener('message', messageHandler);
+            if (!authWindow.closed) {
+              authWindow.close();
+            }
+            contentDiv.innerHTML = originalContent;
+            reject(new Error(event.data.error));
+          }
+        };
+        
+        window.addEventListener('message', messageHandler);
+        
+        // Also poll for window close as fallback
         const pollInterval = setInterval(() => {
           if (authWindow.closed) {
             clearInterval(pollInterval);
+            window.removeEventListener('message', messageHandler);
             contentDiv.innerHTML = originalContent;
             
-            // Check if we got tokens
-            const tokens = getTokens();
-            if (tokens && !tokens.isExpired) {
+            // Check if we got tokens via localStorage
+            const accessToken = localStorage.getItem('nc_access_token');
+            if (accessToken) {
               resolve();
             } else {
               reject(new Error('Login was not completed'));
