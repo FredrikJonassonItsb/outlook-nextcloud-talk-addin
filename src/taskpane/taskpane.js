@@ -452,12 +452,28 @@ function showStatus(message, containerId = 'statusMessage') {
  */
 function showError(message, containerId = 'errorMessage') {
   const container = document.getElementById(containerId);
-  container.textContent = message;
-  container.style.display = 'block';
+  if (container) {
+    container.textContent = message;
+    container.style.display = 'block';
+  }
   
   // Hide status
   if (containerId === 'errorMessage') {
-    document.getElementById('statusMessage').style.display = 'none';
+    const statusContainer = document.getElementById('statusMessage');
+    if (statusContainer) {
+      statusContainer.style.display = 'none';
+    }
+  }
+}
+
+/**
+ * Hide error message
+ */
+function hideError(containerId = 'errorMessage') {
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.style.display = 'none';
+    container.textContent = '';
   }
 }
 
