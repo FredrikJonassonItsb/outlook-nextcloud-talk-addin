@@ -91,19 +91,27 @@ function showLoginView() {
  */
 async function showMainView() {
   try {
+    console.log('showMainView: Starting');
     hideView('loadingView');
     hideView('loginView');
     
     // Load user profile
     const profile = getUserProfile();
+    console.log('showMainView: User profile:', profile);
     if (profile) {
-      document.getElementById('userName').textContent = profile.displayname || profile.id;
+      const userNameEl = document.getElementById('userName');
+      if (userNameEl) {
+        userNameEl.textContent = profile.displayname || profile.id;
+      }
     }
     
     // Load meeting data
+    console.log('showMainView: Loading meeting data');
     await loadMeetingData();
     
+    console.log('showMainView: Showing main view');
     showView('mainView');
+    console.log('showMainView: Complete');
     
   } catch (error) {
     console.error('Show main view error:', error);
@@ -308,14 +316,21 @@ async function handleLogin() {
     try {
       await login(cleanServerUrl);
       
+      // Login successful - hide error and show main view
+      hideError('loginError');
+      console.log('Login successful, showing main view');
+      
       // Show main view
       await showMainView();
+      
     } catch (loginError) {
       console.error('Login error:', loginError);
       
       // Check if it's a dialog error
       if (loginError.message && loginError.message.includes('dialog')) {
         showError('Could not open login dialog. Please check that pop-ups are allowed and try again.', 'loginError');
+      } else if (loginError.message && loginError.message.includes('not completed')) {
+        showError('Login was cancelled or not completed. Please try again.', 'loginError');
       } else {
         showError(loginError.message || t('error.authentication'), 'loginError');
       }
