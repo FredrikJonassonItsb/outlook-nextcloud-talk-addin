@@ -56,30 +56,27 @@
   <div class="container">
     <div id="spinner" class="spinner"></div>
     <p id="status">Completing authentication...</p>
-    <p id="message" class="message"></p>
+    <p id="message" class="message">You can close this window now.</p>
   </div>
   
-  <script src="../utils/config.js"></script>
-  <script src="../utils/storage.js"></script>
-  
   <script>
-    (async function() {
+    (function() {
       'use strict';
       
       const statusEl = document.getElementById('status');
       const messageEl = document.getElementById('message');
       const spinnerEl = document.getElementById('spinner');
       
-      function showSuccess(msg) {
+      function showSuccess() {
         spinnerEl.style.display = 'none';
-        statusEl.innerHTML = '<div class="success">✓</div>' + msg;
-        messageEl.textContent = 'You can close this window now.';
+        statusEl.innerHTML = '<div class="success">✓</div>Authentication successful!';
+        messageEl.textContent = 'This window will close automatically.';
       }
       
       function showError(msg) {
         spinnerEl.style.display = 'none';
         statusEl.innerHTML = '<div class="error">✗</div>' + msg;
-        messageEl.textContent = 'Please try again.';
+        messageEl.textContent = 'Please close this window and try again.';
       }
       
       try {
@@ -91,107 +88,46 @@
         const errorDescription = params.get('error_description');
         
         if (error) {
-          showError('Authentication failed: ' + (errorDescription || error));
+          showError('Authentication failed');
           
-          // Try to send error to parent
+          // Send error to parent window
           if (window.opener) {
-            window.opener.postMessage({ error: errorDescription || error }, '*');
+            window.opener.postMessage({ 
+              type: 'oauth_callback',
+              error: errorDescription || error 
+            }, '*');
           }
+          
+          setTimeout(() => window.close(), 3000);
           return;
         }
         
         if (!code) {
           showError('No authorization code received');
+          setTimeout(() => window.close(), 3000);
           return;
         }
         
-        // Get server URL from storage
-        statusEl.textContent = 'Exchanging authorization code...';
+        // Send code to parent window
+        showSuccess();
         
-        // Get server URL from localStorage (shared between windows)
-        const serverUrl = localStorage.getItem('nc_server_url');
-        
-        if (!serverUrl) {
-          showError('Server URL not found');
-          return;
-        }
-        
-        // Exchange code for tokens
-        const tokenUrl = `${serverUrl}/apps/oauth2/api/v1/token`;
-        
-        const body = new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          client_id: CONFIG.oauth.clientId,
-          client_secret: CONFIG.oauth.clientSecret,
-          redirect_uri: CONFIG.oauth.redirectUri
-        });
-        
-        const response = await fetch(tokenUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: body.toString()
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Token exchange failed:', errorText);
-          showError('Failed to exchange authorization code');
-          return;
-        }
-        
-        const data = await response.json();
-        
-        // Save tokens to localStorage (shared between windows)
-        const tokens = {
-          accessToken: data.access_token,
-          refreshToken: data.refresh_token,
-          expiresIn: data.expires_in,
-          tokenType: data.token_type,
-          expiresAt: Date.now() + (data.expires_in * 1000)
-        };
-        
-        localStorage.setItem('nc_access_token', tokens.accessToken);
-        localStorage.setItem('nc_refresh_token', tokens.refreshToken);
-        localStorage.setItem('nc_token_expiry', tokens.expiresAt.toString());
-        
-        // Get user profile
-        statusEl.textContent = 'Getting user profile...';
-        
-        const profileResponse = await fetch(`${serverUrl}/ocs/v2.php/cloud/user?format=json`, {
-          headers: {
-            'Authorization': `Bearer ${tokens.accessToken}`,
-            'OCS-APIRequest': 'true'
-          }
-        });
-        
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          if (profileData.ocs && profileData.ocs.data) {
-            localStorage.setItem('nc_user_profile', JSON.stringify(profileData.ocs.data));
-          }
-        }
-        
-        showSuccess('Authentication successful!');
-        
-        // Send success message to parent
         if (window.opener) {
           window.opener.postMessage({ 
-            success: true,
-            tokens: tokens
+            type: 'oauth_callback',
+            code: code,
+            state: state
           }, '*');
         }
         
-        // Close window after delay
+        // Close window after short delay
         setTimeout(() => {
           window.close();
-        }, 2000);
+        }, 1500);
         
       } catch (error) {
         console.error('Callback error:', error);
-        showError('An error occurred: ' + error.message);
+        showError('An error occurred');
+        setTimeout(() => window.close(), 3000);
       }
     })();
   </script>

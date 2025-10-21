@@ -155,30 +155,53 @@ async function loginWithExternalWindow(serverUrl) {
         }
         
         // Listen for postMessage from callback window
-        const messageHandler = (event) => {
-          if (event.data && event.data.success) {
-            // Authentication successful
+        const messageHandler = async (event) => {
+          // Check if this is our OAuth callback message
+          if (event.data && event.data.type === 'oauth_callback') {
             window.removeEventListener('message', messageHandler);
-            if (!authWindow.closed) {
-              authWindow.close();
+            clearInterval(pollInterval);
+            
+            if (event.data.error) {
+              // Authentication failed
+              if (!authWindow.closed) {
+                authWindow.close();
+              }
+              contentDiv.innerHTML = originalContent;
+              reject(new Error(event.data.error));
+              return;
             }
-            contentDiv.innerHTML = originalContent;
-            resolve();
-          } else if (event.data && event.data.error) {
-            // Authentication failed
-            window.removeEventListener('message', messageHandler);
-            if (!authWindow.closed) {
-              authWindow.close();
+            
+            if (event.data.code) {
+              // We got the authorization code, now exchange it for tokens
+              try {
+                // Close the auth window
+                if (!authWindow.closed) {
+                  authWindow.close();
+                }
+                
+                // Exchange code for tokens
+                const tokens = await exchangeCodeForTokens(serverUrl, event.data.code);
+                await saveTokens(tokens);
+                
+                // Get user profile
+                const profile = await getUserProfile(serverUrl, tokens.accessToken);
+                await saveUserProfile(profile);
+                
+                contentDiv.innerHTML = originalContent;
+                resolve();
+              } catch (error) {
+                console.error('Token exchange error:', error);
+                contentDiv.innerHTML = originalContent;
+                reject(error);
+              }
             }
-            contentDiv.innerHTML = originalContent;
-            reject(new Error(event.data.error));
           }
         };
         
         window.addEventListener('message', messageHandler);
         
         // Also poll for window close as fallback
-        const pollInterval = setInterval(() => {
+        let pollInterval = setInterval(() => {
           if (authWindow.closed) {
             clearInterval(pollInterval);
             window.removeEventListener('message', messageHandler);
