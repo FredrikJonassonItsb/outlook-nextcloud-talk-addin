@@ -1,0 +1,30 @@
+{
+  "name": "outlook-nextcloud-talk-addin",
+  "version": "2.0.0",
+  "description": "Outlook add-in for Nextcloud Talk integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FredrikJonassonItsb/outlook-nextcloud-talk-addin.git"
+  },
+  "keywords": [
+    "outlook",
+    "nextcloud",
+    "talk",
+    "office-addin",
+    "calendar"
+  ],
+  "author": "ITSL Solutions",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+
