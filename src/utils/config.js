@@ -1,5 +1,6 @@
 /**
  * Configuration for Nextcloud Talk Outlook Add-in
+ * Updated for dev2.hubs.se - 2025-10-24
  */
 
 const CONFIG = {
