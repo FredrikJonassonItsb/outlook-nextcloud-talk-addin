@@ -6,7 +6,7 @@ const CONFIG = {
   // Nextcloud server configuration
   nextcloud: {
     // Default server URL - should be configured by admin or user
-    serverUrl: 'https://nextcloud.example.com',
+    serverUrl: 'https://dev2.hubs.se',
     
     // API endpoints
     endpoints: {
@@ -24,8 +24,8 @@ const CONFIG = {
   
   // OAuth2/OIDC configuration
   oauth: {
-    clientId: 'e9KdrQVdvNLeyDv9TjhfFLZ4sWwe8LzyMXpzbB8PcVIEvjVNvKkAaRaxesXNBOeB',
-    clientSecret: 'Y2AkOMa5D9dm4PsFy6GGwe1ejbIukX5K65obDL6c0uq9wuZUHzqctZMGIU5DJ3V8', // Configured for itsl2.hubs.se
+    clientId: 'wvFQ1DUrP7WOsEHhAHUHQRcb7hI2ZCP2Nyw6WsIz4NGn5lyvT7XZRQXY79sIypNI',
+    clientSecret: '6gywldknzsZ3Vlglvh8i37WiuvN4vW6ReFQcLITThzfpMp3gtGTjrKkxrNZuufgo', // Configured for dev2.hubs.se
     redirectUri: 'https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/src/taskpane/callback.html',
     scope: 'openid profile email',
     responseType: 'code'
