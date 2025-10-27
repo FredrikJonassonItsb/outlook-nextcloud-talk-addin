@@ -1,6 +1,7 @@
 /**
- * Configuration for Nextcloud Talk Outlook Add-in
- * Updated for dev2.hubs.se - 2025-10-24
+ * Configuration for Nextcloud Talk Outlook Add-in v3
+ * Server: dev2.hubs.se
+ * Last Updated: 2025-10-25
  */
 
 const CONFIG = {
@@ -34,8 +35,8 @@ const CONFIG = {
   
   // Application settings
   app: {
-    name: 'Nextcloud Talk for Outlook',
-    version: '2.0.0',
+    name: 'Nextcloud Talk for Outlook v3',
+    version: '3.0.0',
     defaultLocale: 'en-US',
     supportedLocales: ['en-US', 'sv-SE']
   },

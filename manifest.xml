@@ -5,13 +5,13 @@
            xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
            xsi:type="MailApp">
   
-  <Id>a9d8f7e6-5c4b-3a2d-1e0f-9b8a7c6d5e4f</Id>
-  <Version>2.0.0.0</Version>
+  <Id>b1e2f3a4-6d5c-4e3f-2a1b-0c9d8e7f6a5b</Id>
+  <Version>3.0.0.0</Version>
   <ProviderName>ITSLyzer</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   
-  <DisplayName DefaultValue="Nextcloud Talk for Outlook v2"/>
-  <Description DefaultValue="Integrate Nextcloud Talk meetings and calendar with Outlook (v2 - GitHub Pages hosted)"/>
+  <DisplayName DefaultValue="Nextcloud Talk for Outlook v3"/>
+  <Description DefaultValue="Integrate Nextcloud Talk meetings and calendar with Outlook (v3 - dev2.hubs.se)"/>
   
   <IconUrl DefaultValue="https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/src/assets/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://fredrikjonassonitsb.github.io/outlook-nextcloud-talk-addin/src/assets/icon-128.png"/>

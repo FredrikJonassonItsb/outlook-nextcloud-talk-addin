@@ -84,6 +84,12 @@ function showLoginView() {
   } else {
     document.getElementById('serverUrl').value = CONFIG.nextcloud.serverUrl;
   }
+  
+  // Display version info
+  const versionText = document.getElementById('versionText');
+  if (versionText) {
+    versionText.textContent = `${CONFIG.app.name} - v${CONFIG.app.version} (${CONFIG.nextcloud.serverUrl})`;
+  }
 }
 
 /**
